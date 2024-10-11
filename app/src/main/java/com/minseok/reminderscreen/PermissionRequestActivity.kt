@@ -7,6 +7,7 @@ import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 
+
 class PermissionRequestActivity : AppCompatActivity() {
 
     companion object {

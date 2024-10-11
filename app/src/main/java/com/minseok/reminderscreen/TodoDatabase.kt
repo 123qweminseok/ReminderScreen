@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [TodoItem::class], version = 1)
+@Database(entities = [TodoItem::class], version = 2) // 버전을 1에서 2로 증가
 @TypeConverters(Converters::class)
 abstract class TodoDatabase : RoomDatabase() {
     abstract fun todoDao(): TodoDao
@@ -20,7 +20,10 @@ abstract class TodoDatabase : RoomDatabase() {
                     context.applicationContext,
                     TodoDatabase::class.java,
                     "todo_database"
-                ).build().also { instance = it }
+                )
+                    .fallbackToDestructiveMigration() // 이 줄을 추가
+                    .build()
+                    .also { instance = it }
             }
         }
     }

@@ -5,43 +5,106 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvClock"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/dateNavigation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="48sp"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp" />
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnPrevDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/btnNextDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&gt;" />
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/tvDate"
+        android:id="@+id/tvTodoCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/tvClock"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/dateNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:textSize="16sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
+
+    <TextView
+        android:id="@+id/tvMotivationalQuote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTodoCount"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTodoList"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tvDate"
-        app:layout_constraintBottom_toTopOf="@id/btnAdd"
-        android:layout_marginTop="16dp"
-        android:padding="8dp" />
-
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="할 일 추가"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvMotivationalQuote"
+        app:layout_constraintBottom_toTopOf="@id/bottomButtons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/bottomButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/slideToUnlock"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnAddTodo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="할 일 추가" />
+
+        <Button
+            android:id="@+id/btnToMain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="메인으로" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/slideToUnlock"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="밀어서 잠금 해제"
+        android:gravity="center"
+        android:background="#33000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:alpha="0.5"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

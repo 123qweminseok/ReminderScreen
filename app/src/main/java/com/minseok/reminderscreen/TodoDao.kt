@@ -5,15 +5,18 @@ import java.util.Date
 
 @Dao
 interface TodoDao {
-    @Query("SELECT * FROM todo_items WHERE date = :date")
+    @Query("SELECT * FROM todo_items")
+    suspend fun getAllTodoItems(): List<TodoItem>
+
+    @Query("SELECT * FROM todo_items WHERE date(date / 1000, 'unixepoch') = date(:date / 1000, 'unixepoch')")
     suspend fun getTodoItemsByDate(date: Date): List<TodoItem>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(todoItem: TodoItem)
+    @Insert
+    suspend fun insertTodoItem(todoItem: TodoItem)
 
     @Update
-    suspend fun update(todoItem: TodoItem)
+    suspend fun updateTodoItem(todoItem: TodoItem)
 
     @Delete
-    suspend fun delete(todoItem: TodoItem)
+    suspend fun deleteTodoItem(todoItem: TodoItem)
 }

@@ -10,5 +10,7 @@ data class TodoItem(
     var content: String,
     var isCompleted: Boolean = false,
     var date: Date,
-    var time: Date? = null
+    var time: Date? = null,
+    var priority: Int = 0,
+    var createdAt: Long = System.currentTimeMillis()
 )

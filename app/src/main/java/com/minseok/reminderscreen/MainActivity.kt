@@ -3,23 +3,38 @@ package com.minseok.reminderscreen
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.work.*
+import java.util.concurrent.TimeUnit
+import androidx.work.Constraints
+import com.skydoves.colorpickerview.ColorPickerDialog
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: TodoViewModel
     private lateinit var adapter: TodoAdapter
     private var currentDate = Calendar.getInstance()
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,19 +47,106 @@ class MainActivity : AppCompatActivity() {
         setupObservers()
         setupUI()
         startService(Intent(this, LockScreenService::class.java))
+        setupWorkManager()
+
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+
+    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_change_background -> {
+                showColorPickerDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+    private fun showColorPickerDialog() {
+        val colorPickerDialog = ColorPickerDialog.Builder(this)
+            .setTitle("배경색 선택")
+            .setPositiveButton("선택", ColorEnvelopeListener { envelope, _ ->
+                val color = envelope.color
+                saveBackgroundColor(color)
+            })
+            .setNegativeButton("취소") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            .attachAlphaSlideBar(false)
+            .attachBrightnessSlideBar(true)
+            .setBottomSpace(12)
+
+        colorPickerDialog.show()
+    }
+
+    private fun saveBackgroundColor(color: Int) {
+        sharedPreferences.edit().putInt("backgroundColor", color).apply()
     }
 
     private fun setupRecyclerView() {
         adapter = TodoAdapter(::onTodoItemClick, ::onTodoItemLongClick)
-        findViewById<RecyclerView>(R.id.rvTodoList).apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = this@MainActivity.adapter
-        }
+        val recyclerView = findViewById<RecyclerView>(R.id.rvTodoList)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val todoItem = adapter.currentList[position]
+                todoItem.isCompleted = true
+                viewModel.updateTodoItem(todoItem)
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val itemView = viewHolder.itemView
+                val background = ColorDrawable(Color.GREEN)
+                background.setBounds(
+                    itemView.left,
+                    itemView.top,
+                    itemView.left + dX.toInt(),
+                    itemView.bottom
+                )
+                background.draw(c)
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
+
+
+
+
+
+
+
+
+
+
 
     private fun setupObservers() {
         viewModel.todoItems.observe(this) { items ->
-            adapter.submitList(items.filter { isSameDay(it.date, currentDate.time) })
+            val filteredItems = items.filter { isSameDay(it.date, currentDate.time) }
+            adapter.submitList(filteredItems)
         }
     }
 
@@ -188,4 +290,21 @@ class MainActivity : AppCompatActivity() {
                 cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
                 cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
     }
+    private fun setupWorkManager() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .build()
+
+        val workRequest = PeriodicWorkRequestBuilder<LockScreenWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "LockScreenWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+    }
+
+
 }

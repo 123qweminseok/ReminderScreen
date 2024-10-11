@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -57,6 +58,9 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation ("com.github.skydoves:colorpickerview:2.2.4")  // 최신 버전을 사용하세요
+
 
     // Testing
     testImplementation(libs.junit)
