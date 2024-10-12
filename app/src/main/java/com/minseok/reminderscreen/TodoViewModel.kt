@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 
 class TodoViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,6 +43,11 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
                 Log.e("TodoViewModel", "Error loading todo items for date: $date", e)
             }
         }
+    }
+    fun getTodoItemsForDate(date: LocalDate): List<TodoItem> {
+        return todoItems.value?.filter {
+            it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == date
+        } ?: emptyList()
     }
 
     fun addTodoItem(todoItem: TodoItem) {

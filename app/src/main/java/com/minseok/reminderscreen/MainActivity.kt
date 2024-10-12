@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -26,6 +27,7 @@ import java.util.*
 import androidx.work.*
 import java.util.concurrent.TimeUnit
 import androidx.work.Constraints
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
@@ -52,8 +54,45 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+        setupBottomNavigation()
 
     }
+
+    private fun setupBottomNavigation() {
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when(item.itemId) {
+                R.id.navigation_home -> {
+                    showHomeView()
+                    true
+                }
+                R.id.navigation_calendar -> {
+                    showCalendarFragment()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+    private fun showHomeView() {
+        findViewById<View>(R.id.dateNavigation).visibility = View.VISIBLE
+        findViewById<View>(R.id.rvTodoList).visibility = View.VISIBLE
+        supportFragmentManager.findFragmentById(R.id.fragment_container)?.let {
+            supportFragmentManager.beginTransaction().remove(it).commit()
+        }
+    }
+
+    private fun showCalendarFragment() {
+        findViewById<View>(R.id.dateNavigation).visibility = View.GONE
+        findViewById<View>(R.id.rvTodoList).visibility = View.GONE
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+        if (fragment !is CalendarFragment) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, CalendarFragment())
+                .commit()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
