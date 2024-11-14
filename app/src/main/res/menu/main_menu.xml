@@ -5,4 +5,17 @@
         android:id="@+id/action_change_background"
         android:title="배경색상 변경"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_notification_settings"
+        android:title="알림 설정"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_change_background"
+        android:title="배경색 변경"
+        android:orderInCategory="101"
+        app:showAsAction="never"/>
 </menu>
+

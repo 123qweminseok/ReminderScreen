@@ -250,6 +250,28 @@ class LockScreenActivity : AppCompatActivity(), GestureDetector.OnGestureListene
         var selectedDate = currentDate.clone() as Calendar
         var selectedTime: Date? = null
 
+        AlertDialog.Builder(this)
+            .setTitle("할 일 추가")
+            .setView(dialogView)
+            .setPositiveButton("추가") { _, _ ->
+                val content = etContent.text.toString()
+                if (content.isNotEmpty()) {
+                    val todoItem = TodoItem(content = content, date = selectedDate.time, time = selectedTime)
+                    viewModel.addTodoItem(todoItem)
+
+                    // 알림 설정 추가
+                    if (selectedTime != null) {
+                        NotificationHelper(this).scheduleNotification(todoItem)
+                    }
+
+                    loadTodoItems()
+                }
+            }
+            .setNegativeButton("취소", null)
+            .show()
+
+
+
         btnSetDate.setOnClickListener {
             DatePickerDialog(
                 this,
