@@ -2,7 +2,7 @@
 ㅁ
 ## 주요 설명
 - **Todo 캘린더**: 갤럭시 핸드폰의 캘린더 기능과 시계(Todo 리스트)를 결합한 어플리케이션
-- **수상 경력**: 
+- **수상 경력 및 설명**: 
   - 구글 플레이스토어에 첫 개인 프로젝트로 출시하려던 어플을 **성결대학교 ICT경진대회**(전 학년 참여 대회)에 제출하여 **최우수상(1등)** 획득
   - [수상 링크 보기](https://www.sungkyul.ac.kr/sungkyulice/4167/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc3VuZ2t5dWxpY2UlMkYxMzc3JTJGMzY3MDQlMkZhcnRjbFZpZXcuZG8lM0Zpc1ZpZXdNaW5lJTNEZmFsc2UlMjZiYnNDbFNlcSUzRCUyNnNyY2hXcmQlM0QlMjZyZ3NCZ25kZVN0ciUzRCUyNnBhZ2UlM0QxJTI2YmJzT3BlbldyZFNlcSUzRCUyNnJnc0VuZGRlU3RyJTNEJTI2c3JjaENvbHVtbiUzRCUyNnBhc3N3b3JkJTNEJTI2)
 - **구글 플레이스토어 출시**: 
