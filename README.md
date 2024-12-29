@@ -7,6 +7,7 @@
   - [수상 링크 보기](https://www.sungkyul.ac.kr/sungkyulice/4167/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc3VuZ2t5dWxpY2UlMkYxMzc3JTJGMzY3MDQlMkZhcnRjbFZpZXcuZG8lM0Zpc1ZpZXdNaW5lJTNEZmFsc2UlMjZiYnNDbFNlcSUzRCUyNnNyY2hXcmQlM0QlMjZyZ3NCZ25kZVN0ciUzRCUyNnBhZ2UlM0QxJTI2YmJzT3BlbldyZFNlcSUzRCUyNnJnc0VuZGRlU3RyJTNEJTI2c3JjaENvbHVtbiUzRCUyNnBhc3N3b3JkJTNEJTI2)
 - **구글 플레이스토어 출시**: 
   - [앱 다운로드 링크](https://play.google.com/store/apps/details?id=com.minseok.reminderscreen)
+- **작업 기간**: 2024.10-11월
 
 ---
 
