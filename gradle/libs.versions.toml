@@ -12,7 +12,8 @@ activity = "1.9.2"
 constraintlayout = "2.1.4"
 room = "2.6.1"  # Room 버전을 통일
 lifecycle = "2.7.0"  # Lifecycle 컴포넌트 버전 추가
-coroutines = "1.7.3"  # Coroutines 버전 업데이트
+coroutines = "1.7.3"
+tvMaterial = "1.0.0"  # Coroutines 버전 업데이트
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,6 +31,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-tv-material = { group = "androidx.tv", name = "tv-material", version.ref = "tvMaterial" }
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.2.2" }

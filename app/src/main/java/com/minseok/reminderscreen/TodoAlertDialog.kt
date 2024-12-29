@@ -79,6 +79,12 @@ class TodoAlertDialog : AppCompatActivity() {
         }, 5 * 60 * 1000)  // 5분
     }
 
+
+
+
+
+
+
     private fun acquireWakeLock() {
         val powerManager = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(

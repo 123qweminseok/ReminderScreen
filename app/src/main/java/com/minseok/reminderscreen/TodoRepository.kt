@@ -9,7 +9,6 @@ class TodoRepository(context: Context) {
     suspend fun getAllTodoItems(): List<TodoItem> {
         return todoDao.getAllTodoItems()
     }
-
     suspend fun getTodoItemsByDate(date: Date): List<TodoItem> {
         return todoDao.getTodoItemsByDate(date)
     }
@@ -25,4 +24,9 @@ class TodoRepository(context: Context) {
     suspend fun deleteTodoItem(todoItem: TodoItem) {
         todoDao.deleteTodoItem(todoItem)
     }
+
+    suspend fun getTodoItemById(id: Long): TodoItem? {  // Long 타입으로 변경
+        return todoDao.getTodoItemById(id)
+    }
+
 }

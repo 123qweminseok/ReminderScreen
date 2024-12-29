@@ -1,6 +1,8 @@
 package com.minseok.reminderscreen
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -12,15 +14,34 @@ class PermissionRequestActivity : AppCompatActivity() {
 
     companion object {
         private const val OVERLAY_PERMISSION_REQUEST_CODE = 1234
+        private const val PREFS_NAME = "PermissionPrefs"
+        private const val PREF_OVERLAY_PERMISSION = "overlay_permission"
     }
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+        // 이미 권한이 있거나 권한을 승인한 적이 있는지 확인
+        if (checkPermission()) {
+            startMainActivity()
+            return
+        }
+
         setContentView(R.layout.activity_permission_request)
 
         findViewById<Button>(R.id.btnGrantPermission).setOnClickListener {
             requestOverlayPermission()
         }
+    }
+
+    private fun checkPermission(): Boolean {
+        // 실제 권한이 있고 AND SharedPreferences에 저장된 값이 true인 경우
+        return Settings.canDrawOverlays(this) &&
+                sharedPreferences.getBoolean(PREF_OVERLAY_PERMISSION, false)
     }
 
     private fun requestOverlayPermission() {
@@ -31,18 +52,35 @@ class PermissionRequestActivity : AppCompatActivity() {
         startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
     }
 
+    private fun startMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == OVERLAY_PERMISSION_REQUEST_CODE) {
             if (Settings.canDrawOverlays(this)) {
-                // 권한이 부여되었으므로 메인 액티비티로 이동
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
+                // 권한이 부여되면 SharedPreferences에 저장
+                sharedPreferences.edit()
+                    .putBoolean(PREF_OVERLAY_PERMISSION, true)
+                    .apply()
+
+                startMainActivity()
             } else {
-                // 사용자가 권한을 거부한 경우 처리
-                // 여기서는 단순히 버튼을 다시 클릭할 수 있게 합니다.
-                // 실제 앱에서는 사용자에게 왜 이 권한이 필요한지 추가 설명을 제공할 수 있습니다.
+                // 권한이 거부된 경우
+                sharedPreferences.edit()
+                    .putBoolean(PREF_OVERLAY_PERMISSION, false)
+                    .apply()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 화면이 다시 보일 때마다 권한 체크
+        if (checkPermission()) {
+            startMainActivity()
         }
     }
 }

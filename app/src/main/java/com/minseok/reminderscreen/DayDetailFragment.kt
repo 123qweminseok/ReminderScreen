@@ -1,25 +1,32 @@
 package com.minseok.reminderscreen
 
 import android.app.TimePickerDialog
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.button.MaterialButton
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
-import androidx.appcompat.app.AlertDialog
-import android.widget.EditText
 
 class DayDetailDialogFragment : DialogFragment() {
     private lateinit var viewModel: TodoViewModel
@@ -27,13 +34,15 @@ class DayDetailDialogFragment : DialogFragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var dateText: TextView
     private lateinit var dayText: TextView
-    private lateinit var addButton: FloatingActionButton
+    private lateinit var addButton: MaterialButton
+    private lateinit var bottomSheet: CardView
+    private lateinit var backgroundDim: View
     private lateinit var date: LocalDate
-
 
     interface DataChangeListener {
         fun onDataChanged()
     }
+
     private var dataChangeListener: DataChangeListener? = null
 
     fun setDataChangeListener(listener: DataChangeListener) {
@@ -52,6 +61,11 @@ class DayDetailDialogFragment : DialogFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.FullScreenDialog)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_day_detail_popup, container, false)
     }
@@ -59,8 +73,10 @@ class DayDetailDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(requireActivity()).get(TodoViewModel::class.java)
+        viewModel = TodoViewModel.getInstance(requireActivity().application)
 
+        bottomSheet = view.findViewById(R.id.bottomSheet)
+        backgroundDim = view.findViewById(R.id.backgroundDim)
         dateText = view.findViewById(R.id.dateText)
         dayText = view.findViewById(R.id.dayText)
         recyclerView = view.findViewById(R.id.rvTodoList)
@@ -70,37 +86,122 @@ class DayDetailDialogFragment : DialogFragment() {
 
         setupRecyclerView()
         setupUI()
+        setupAnimation()
         updateTodoItems()
     }
 
+
+
+
+
+
+
+
     private fun setupRecyclerView() {
-        adapter = TodoAdapter(::onTodoItemClick, ::onTodoItemLongClick)
+        adapter = TodoAdapter(
+            onItemClick = { todoItem ->
+                showEditTodoDialog(todoItem)
+            },
+            onItemLongClick = { todoItem ->
+                showDeleteConfirmationDialog(todoItem)
+            },
+            onItemCheckChanged = { updatedItem ->
+                viewModel.updateTodoItem(updatedItem)
+                dataChangeListener?.onDataChanged()
+            }
+        )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
                 return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val todoItem = adapter.currentList[position]
-                showDeleteConfirmationDialog(todoItem)
+                val todoItem = adapter.currentList[position].copy()
+
+                // 새로운 상태로 아이템 업데이트
+                val updatedItem = todoItem.copy(
+                    isCompleted = direction == ItemTouchHelper.RIGHT,
+                    createdAt = System.currentTimeMillis()
+                )
+
+                // 즉시 UI 업데이트
+                val currentList = adapter.currentList.toMutableList()
+                currentList[position] = updatedItem
+                adapter.submitList(currentList) {
+                    // 리스트 제출이 완료된 후에 실행
+                    adapter.notifyItemChanged(position)
+                }
+
+                // ViewModel 업데이트
+                viewModel.updateTodoItem(updatedItem)
+
+                // 캘린더 뷰 업데이트
+                dataChangeListener?.onDataChanged()
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    // 스와이프 방향에 따른 배경색 설정이나 아이콘 추가 가능
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
         })
 
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
+
+
+
+
+
     private fun setupUI() {
         val formatter = DateTimeFormatter.ofPattern("M월 d일")
-        dateText.text = date.format(formatter)
+        dateText.text = "음력 ${date.format(formatter)}"
         dayText.text = "${date.dayOfMonth} ${date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())}"
+
+        // 추가 버튼의 텍스트를 동적으로 설정
+        addButton.text = "${date.format(formatter)}에 추가"
 
         addButton.setOnClickListener {
             showAddTodoDialog()
         }
+
+        view?.findViewById<ImageButton>(R.id.btnMore)?.setOnClickListener {
+            // 추가 옵션 메뉴 표시
+        }
+
+        backgroundDim.setOnClickListener {
+            dismiss()
+        }
+    }
+    private fun setupAnimation() {
+        backgroundDim.alpha = 0f
+        backgroundDim.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .start()
+
+        bottomSheet.translationY = 1000f
+        bottomSheet.alpha = 0f
+        bottomSheet.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(300)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .start()
     }
 
     private fun updateTodoItems() {
@@ -109,27 +210,21 @@ class DayDetailDialogFragment : DialogFragment() {
         dataChangeListener?.onDataChanged()
     }
 
-    private fun onTodoItemClick(todoItem: TodoItem) {
-        showEditTodoDialog(todoItem)
-    }
-
-    private fun onTodoItemLongClick(todoItem: TodoItem) {
-        showDeleteConfirmationDialog(todoItem)
-    }
-
     private fun showAddTodoDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_todo, null)
         val etContent = dialogView.findViewById<EditText>(R.id.etContent)
         val btnSetTime = dialogView.findViewById<TextView>(R.id.btnSetTime)
 
-        var selectedTime: LocalTime? = null
+        var selectedTime: Date? = null
 
         btnSetTime.setOnClickListener {
-            val currentTime = LocalTime.now()
+            val calendar = Calendar.getInstance()
             TimePickerDialog(context, { _, hourOfDay, minute ->
-                selectedTime = LocalTime.of(hourOfDay, minute)
-                btnSetTime.text = selectedTime?.format(DateTimeFormatter.ofPattern("HH:mm"))
-            }, currentTime.hour, currentTime.minute, false).show()
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                selectedTime = calendar.time
+                btnSetTime.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(calendar.time)
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show()
         }
 
         AlertDialog.Builder(requireContext())
@@ -141,14 +236,26 @@ class DayDetailDialogFragment : DialogFragment() {
                     val todoItem = TodoItem(
                         content = content,
                         date = localDateToDate(date),
-                        time = selectedTime?.let { localTimeToDate(it) }
+                        time = selectedTime,
+                        createdAt = System.currentTimeMillis()
                     )
                     viewModel.addTodoItem(todoItem)
                     updateTodoItems()
                 }
             }
             .setNegativeButton("취소", null)
-            .show()
+            .create()
+            .apply {
+                show()
+                getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                    setTextColor(resources.getColor(android.R.color.white, null))
+                    setBackgroundColor(resources.getColor(android.R.color.holo_green_dark, null))
+                }
+                getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
+                    setTextColor(resources.getColor(android.R.color.white, null))
+                    setBackgroundColor(resources.getColor(android.R.color.holo_red_dark, null))
+                }
+            }
     }
 
     private fun showEditTodoDialog(todoItem: TodoItem) {
@@ -156,21 +263,24 @@ class DayDetailDialogFragment : DialogFragment() {
         val etContent = dialogView.findViewById<EditText>(R.id.etContent)
         val btnSetTime = dialogView.findViewById<TextView>(R.id.btnSetTime)
 
+        // 기존 데이터로 초기화
         etContent.setText(todoItem.content)
-        btnSetTime.text = todoItem.time?.let {
-            LocalTime.ofInstant(it.toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm"))
-        } ?: "시간 미설정"
 
-        var selectedTime: LocalTime? = todoItem.time?.let {
-            LocalTime.ofInstant(it.toInstant(), ZoneId.systemDefault())
-        }
+        var selectedTime: Date? = todoItem.time
+        btnSetTime.text = selectedTime?.let {
+            SimpleDateFormat("HH:mm", Locale.getDefault()).format(it)
+        } ?: "시간 설정"
 
         btnSetTime.setOnClickListener {
-            val currentTime = selectedTime ?: LocalTime.now()
+            val calendar = Calendar.getInstance()
+            selectedTime?.let { calendar.time = it }
+
             TimePickerDialog(context, { _, hourOfDay, minute ->
-                selectedTime = LocalTime.of(hourOfDay, minute)
-                btnSetTime.text = selectedTime?.format(DateTimeFormatter.ofPattern("HH:mm"))
-            }, currentTime.hour, currentTime.minute, false).show()
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                selectedTime = calendar.time
+                btnSetTime.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(calendar.time)
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show()
         }
 
         AlertDialog.Builder(requireContext())
@@ -179,26 +289,66 @@ class DayDetailDialogFragment : DialogFragment() {
             .setPositiveButton("수정") { _, _ ->
                 val content = etContent.text.toString()
                 if (content.isNotEmpty()) {
-                    todoItem.content = content
-                    todoItem.time = selectedTime?.let { localTimeToDate(it) }
-                    viewModel.updateTodoItem(todoItem)
-                    updateTodoItems()
+                    val updatedItem = todoItem.copy(
+                        content = content,
+                        time = selectedTime,
+                        createdAt = System.currentTimeMillis()
+                    )
+
+                    // 즉시 UI 업데이트
+                    val currentList = adapter.currentList.toMutableList()
+                    val position = currentList.indexOfFirst { it.id == todoItem.id }
+                    if (position != -1) {
+                        currentList[position] = updatedItem
+                        adapter.submitList(currentList)
+                    }
+
+                    // ViewModel 업데이트
+                    viewModel.updateTodoItem(updatedItem)
+
+                    // 캘린더 뷰 업데이트
+                    dataChangeListener?.onDataChanged()
                 }
             }
             .setNegativeButton("취소", null)
-            .show()
+            .create()
+            .apply {
+                show()
+                getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                    setTextColor(resources.getColor(android.R.color.white, null))
+                    setBackgroundColor(resources.getColor(android.R.color.holo_green_dark, null))
+                }
+                getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
+                    setTextColor(resources.getColor(android.R.color.white, null))
+                    setBackgroundColor(resources.getColor(android.R.color.holo_red_dark, null))
+                }
+            }
     }
 
     private fun localDateToDate(localDate: LocalDate): Date {
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+        val calendar = Calendar.getInstance()
+        calendar.set(
+            localDate.year,
+            localDate.monthValue - 1,  // Calendar의 월은 0-based
+            localDate.dayOfMonth,
+            0, 0, 0
+        )
+        calendar.set(Calendar.MILLISECOND, 0)
+        return calendar.time
     }
+
+
+
+
+
+
+
+
 
     private fun localTimeToDate(localTime: LocalTime): Date {
         val localDateTime = LocalDate.now().atTime(localTime)
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant())
     }
-
-
 
     private fun showDeleteConfirmationDialog(todoItem: TodoItem) {
         AlertDialog.Builder(requireContext())
@@ -206,16 +356,42 @@ class DayDetailDialogFragment : DialogFragment() {
             .setMessage("이 할 일을 삭제하시겠습니까?")
             .setPositiveButton("삭제") { _, _ ->
                 viewModel.deleteTodoItem(todoItem)
-                updateTodoItems()
+                dataChangeListener?.onDataChanged()
+                val javaDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                val items = viewModel.getTodoItemsByDate(javaDate)
+                adapter.submitList(items)
             }
             .setNegativeButton("취소") { _, _ ->
-                updateTodoItems()  // 삭제를 취소한 경우 목록을 다시 로드
+                val javaDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                val items = viewModel.getTodoItemsByDate(javaDate)
+                adapter.submitList(items)
             }
             .show()
     }
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.apply {
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            attributes.windowAnimations = R.style.DialogAnimation
+        }
+    }
+
+    override fun dismiss() {
+        backgroundDim.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .start()
+
+        bottomSheet.animate()
+            .translationY(bottomSheet.height.toFloat())
+            .alpha(0f)
+            .setDuration(200)
+            .setInterpolator(AccelerateInterpolator())
+            .withEndAction {
+                super.dismiss()
+            }
+            .start()
     }
 }

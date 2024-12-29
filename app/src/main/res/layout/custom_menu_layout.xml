@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/menu_popup_background"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/menu_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="알림 설정"
+        android:textSize="16sp"
+        android:textColor="#333333"
+        android:background="@drawable/menu_item_background"
+        android:elevation="2dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/menu_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="배경색 변경"
+        android:textSize="16sp"
+        android:textColor="#333333"
+        android:background="@drawable/menu_item_background"
+        android:elevation="2dp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/menu_item_background"
+        android:elevation="2dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="잠금화면 표시"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:paddingStart="8dp"/>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_lock_screen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:thumbTint="@color/switch_thumb_selector"
+            app:trackTint="@color/switch_track_selector"/>
+    </LinearLayout>
+</LinearLayout>

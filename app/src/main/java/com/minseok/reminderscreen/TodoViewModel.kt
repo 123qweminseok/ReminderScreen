@@ -7,18 +7,35 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
-class TodoViewModel(application: Application) : AndroidViewModel(application) {
+class TodoViewModel private constructor(application: Application) : AndroidViewModel(application) {
     private val repository: TodoRepository = TodoRepository(application)
     private val _todoItems = MutableLiveData<List<TodoItem>>()
     val todoItems: LiveData<List<TodoItem>> = _todoItems
     private val notificationManager = LockScreenNotificationManager(application)
 
+    companion object {
+        @Volatile
+        private var instance: TodoViewModel? = null
+
+        fun getInstance(application: Application): TodoViewModel {
+            return instance ?: synchronized(this) {
+                instance ?: TodoViewModel(application).also { instance = it }
+            }
+        }
+    }
+
     init {
         loadAllTodoItems()
+    }
+
+    fun getTodoItemsByDate(date: Date) = runBlocking {
+        val items = repository.getTodoItemsByDate(date)
+        sortTodoItems(items)  // 정렬된 결과 반환
     }
 
     private fun loadAllTodoItems() {
@@ -44,10 +61,10 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
     fun getTodoItemsForDate(date: LocalDate): List<TodoItem> {
-        return todoItems.value?.filter {
-            it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == date
-        } ?: emptyList()
+        val javaDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+        return getTodoItemsByDate(javaDate)
     }
 
     fun addTodoItem(todoItem: TodoItem) {
@@ -93,6 +110,5 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
             compareBy<TodoItem> { it.isCompleted }
                 .thenByDescending { it.createdAt }
         )
-
     }
 }

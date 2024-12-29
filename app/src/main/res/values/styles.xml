@@ -13,6 +13,166 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    
+    <style name="CustomDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/button_text_color</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/button_text_color</item>
+    </style>
+    <!-- styles.xml -->
+    <style name="CancelButtonStyle">
+        <item name="android:background">@color/button_negative</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- styles.xml -->
+    <style name="CustomAlertDialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+        <item name="buttonStyle">@style/CustomDialogButton</item>
+    </style>
+
+    <style name="CustomDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:background">#4CAF50</item> <!-- 초록색 배경 -->
+    </style>
+
+
+
+
+    <style name="AddButtonStyle">
+        <item name="android:background">@color/button_positive</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="CustomDialogButton.Positive" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#4CAF50</item> <!-- 초록색 -->
+    </style>
+
+    <style name="CustomDialogButton.Negative" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#F44336</item> <!-- 빨간색 -->
+    </style>
+    <!-- res/values/styles.xml -->
+    <style name="CustomAlertDialog2" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+    <style name="CustomTimePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@android:color/holo_blue_light</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+    <style name="RoundedAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
+    <style name="CustomDatePickerDialog2" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#2196F3</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+    <style name="RoundedAlertDialog2" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+    </style>
+
+    <style name="DialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+
+    <style name="CustomMenuText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#2196F3</item>
+        <item name="android:background">@drawable/rounded_menu_item</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="CheckBoxStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:buttonTint">#2196F3</item>
+        <item name="android:minWidth">24dp</item>
+        <item name="android:minHeight">24dp</item>
+        <item name="android:scaleX">1.2</item>
+        <item name="android:scaleY">1.2</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="CustomCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:button">@drawable/custom_checkbox</item>
+    </style>
+
+    <style name="PopupMenuStyle" parent="Widget.Material3.PopupMenu.Overflow">
+        <item name="android:popupBackground">@android:color/transparent</item>
+        <item name="android:popupElevation">0dp</item>
+    </style>
+    <style name="PopupMenuTextAppearance" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#333333</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">@drawable/menu_item_background</item>
+    </style>
+
+    <!-- 기존 스타일들 -->
+    <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#2196F3</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
+
+    <style name="RoundedDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
+    <style name="ColorPickerDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:buttonStyle">@style/ColorPickerButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/ColorPickerPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/ColorPickerNegativeButtonStyle</item>
+    </style>
+    <style name="ColorPickerButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+    <style name="ColorPickerPositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/positive_button_background</item>
+    </style>
+
+    <style name="ColorPickerNegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/negative_button_background</item>
+    </style>
+
+    <style name="FullScreenDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <!-- Dialog animation -->
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+
 </resources>
 

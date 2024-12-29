@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -9,9 +10,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -22,15 +25,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ReminderScreen"
         tools:targetApi="31">
+
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
+
         <activity
             android:name=".PermissionRequestActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -40,16 +44,16 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".TodoAlertDialog"
-            android:theme="@style/Theme.AppCompat.Dialog"
             android:excludeFromRecents="true"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Dialog" />
+
         <activity
             android:name=".NotificationSettingsActivity"
             android:exported="false"
@@ -62,8 +66,7 @@
             android:showOnLockScreen="true"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
-
-
+        <!-- Receivers -->
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
@@ -81,6 +84,29 @@
                 <action android:name="com.minseok.reminderscreen.NOTIFICATION_ALARM" />
             </intent-filter>
         </receiver>
+
+        <!-- Widget Receiver -->
+        <receiver
+            android:name=".TodoWidget"
+            android:label="오늘의 할 일"
+            android:enabled="true"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
+            <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
+            <action android:name="com.minseok.reminderscreen.TOGGLE_WIDGET" />
+            <category android:name="android.intent.category.DEFAULT" />  <!-- 추가 -->
+        </intent-filter>
+        <meta-data
+            android:name="android.appwidget.provider"
+            android:resource="@xml/todo_widget_info" />
+    </receiver>
+
+
+
+
+        <!-- Services -->
         <service
             android:name=".LockScreenService"
             android:enabled="true"

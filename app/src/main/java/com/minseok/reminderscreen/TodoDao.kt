@@ -8,7 +8,10 @@ interface TodoDao {
     @Query("SELECT * FROM todo_items")
     suspend fun getAllTodoItems(): List<TodoItem>
 
-    @Query("SELECT * FROM todo_items WHERE date(date / 1000, 'unixepoch') = date(:date / 1000, 'unixepoch')")
+    @Query("""
+        SELECT * FROM todo_items 
+        WHERE date(date / 1000, 'unixepoch', 'localtime') = date(:date / 1000, 'unixepoch', 'localtime')
+    """)
     suspend fun getTodoItemsByDate(date: Date): List<TodoItem>
 
     @Insert
@@ -19,4 +22,8 @@ interface TodoDao {
 
     @Delete
     suspend fun deleteTodoItem(todoItem: TodoItem)
+
+    @Query("SELECT * FROM todo_items WHERE id = :id")
+    suspend fun getTodoItemById(id: Long): TodoItem?  // Long 타입으로 변경
+
 }

@@ -2,10 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_home2"
         android:title="홈" />
     <item
         android:id="@+id/navigation_calendar"
-        android:icon="@drawable/ic_calendar"
+        android:icon="@drawable/ic_calendar2"
         android:title="달력" />
+    <item
+        android:id="@+id/navigation_feedback"
+        android:icon="@drawable/ic_feedback"
+        android:title="피드백" />
+
 </menu>

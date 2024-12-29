@@ -4,7 +4,6 @@ import android.media.RingtoneManager
 import android.os.Bundle
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Switch
 import android.media.Ringtone
 import android.widget.Button
 import android.os.VibrationEffect
@@ -12,11 +11,27 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.content.Context
 import android.os.Build
+import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
+import android.view.View
+import com.google.android.material.button.MaterialButton
+
 class NotificationSettingsActivity : AppCompatActivity() {
     private lateinit var notificationSettings: NotificationSettings
     private var currentTestRingtone: Ringtone? = null
-    private lateinit var rgVibrationPatterns: RadioGroup  // 추가
-    private lateinit var rgSoundTypes: RadioGroup         // 추가
+    private lateinit var rgVibrationPatterns: RadioGroup
+    private lateinit var rgSoundTypes: RadioGroup
+    private var customSoundUri: Uri? = null
+
+    private val pickAudio = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            customSoundUri = it
+            rgSoundTypes.check(R.id.rbSoundType4)
+            notificationSettings.soundType = 3
+            notificationSettings.customSoundUri = it.toString()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,11 +39,9 @@ class NotificationSettingsActivity : AppCompatActivity() {
 
         notificationSettings = NotificationSettings(this)
 
-        // RadioGroup 초기화를 먼저 수행
         rgVibrationPatterns = findViewById(R.id.rgVibrationPatterns)
         rgSoundTypes = findViewById(R.id.rgSoundTypes)
 
-        // 초기 상태 설정
         rgVibrationPatterns.isEnabled = notificationSettings.useVibration
         rgSoundTypes.isEnabled = notificationSettings.useSound
 
@@ -39,27 +52,31 @@ class NotificationSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupSwitches() {
-        // 진동 스위치 설정
-        findViewById<Switch>(R.id.switchVibration).apply {
+        findViewById<SwitchMaterial>(R.id.switchVibration).apply {
             isChecked = notificationSettings.useVibration
             setOnCheckedChangeListener { _, isChecked ->
                 notificationSettings.useVibration = isChecked
-                rgVibrationPatterns.isEnabled = isChecked  // 변경
+                rgVibrationPatterns.isEnabled = isChecked
             }
         }
 
-        // 소리 스위치 설정
-        findViewById<Switch>(R.id.switchSound).apply {
+        findViewById<SwitchMaterial>(R.id.switchSound).apply {
             isChecked = notificationSettings.useSound
             setOnCheckedChangeListener { _, isChecked ->
                 notificationSettings.useSound = isChecked
-                rgSoundTypes.isEnabled = isChecked  // 변경
+                rgSoundTypes.isEnabled = isChecked
+            }
+        }
+
+        findViewById<SwitchMaterial>(R.id.switchTodoCount).apply {
+            isChecked = notificationSettings.showTodoCountNotification
+            setOnCheckedChangeListener { _, isChecked ->
+                notificationSettings.showTodoCountNotification = isChecked
             }
         }
     }
-
     private fun setupVibrationPatterns() {
-        rgVibrationPatterns.check(  // 변경
+        rgVibrationPatterns.check(
             when (notificationSettings.vibrationPattern) {
                 0 -> R.id.rbVibrationPattern1
                 1 -> R.id.rbVibrationPattern2
@@ -67,7 +84,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
                 else -> R.id.rbVibrationPattern1
             }
         )
-        rgVibrationPatterns.setOnCheckedChangeListener { _, checkedId ->  // 변경
+        rgVibrationPatterns.setOnCheckedChangeListener { _, checkedId ->
             notificationSettings.vibrationPattern = when (checkedId) {
                 R.id.rbVibrationPattern1 -> 0
                 R.id.rbVibrationPattern2 -> 1
@@ -78,31 +95,44 @@ class NotificationSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupSoundTypes() {
-        rgSoundTypes.check(  // 변경
+        rgSoundTypes.check(
             when (notificationSettings.soundType) {
                 0 -> R.id.rbSoundType1
                 1 -> R.id.rbSoundType2
                 2 -> R.id.rbSoundType3
+                3 -> R.id.rbSoundType4
                 else -> R.id.rbSoundType1
             }
         )
-        rgSoundTypes.setOnCheckedChangeListener { _, checkedId ->  // 변경
+
+        val btnSelectSound = findViewById<MaterialButton>(R.id.btnSelectSound)
+
+        rgSoundTypes.setOnCheckedChangeListener { _, checkedId ->
             notificationSettings.soundType = when (checkedId) {
                 R.id.rbSoundType1 -> 0
                 R.id.rbSoundType2 -> 1
                 R.id.rbSoundType3 -> 2
+                R.id.rbSoundType4 -> 3
                 else -> 0
             }
+            btnSelectSound.visibility = if (checkedId == R.id.rbSoundType4) View.VISIBLE else View.GONE
             stopTestSound()
         }
+
+        btnSelectSound.setOnClickListener {
+            pickAudio.launch("audio/*")
+        }
+
+        // 기존 사용자 지정 사운드 URI 복원
+        notificationSettings.customSoundUri?.let {
+            customSoundUri = Uri.parse(it)
+        }
+
+        // 사용자 지정 사운드가 선택되어 있으면 버튼 표시
+        if (notificationSettings.soundType == 3) {
+            btnSelectSound.visibility = View.VISIBLE
+        }
     }
-
-
-
-
-
-
-
 
     private fun setupTestButtons() {
         findViewById<Button>(R.id.btnTestVibration).setOnClickListener {
@@ -118,9 +148,9 @@ class NotificationSettingsActivity : AppCompatActivity() {
         if (!notificationSettings.useVibration) return
 
         val pattern = when (notificationSettings.vibrationPattern) {
-            0 -> longArrayOf(0, 200, 200, 200) // 짧은 진동
-            1 -> longArrayOf(0, 500, 200, 500) // 긴 진동
-            2 -> longArrayOf(0, 200, 200, 200, 200, 200) // 연속 진동
+            0 -> longArrayOf(0, 200, 200, 200)
+            1 -> longArrayOf(0, 500, 200, 500)
+            2 -> longArrayOf(0, 200, 200, 200, 200, 200)
             else -> longArrayOf(0, 200, 200, 200)
         }
 
@@ -144,13 +174,13 @@ class NotificationSettingsActivity : AppCompatActivity() {
 
     private fun testSound() {
         stopTestSound()
-
         if (!notificationSettings.useSound) return
 
         val soundUri = when (notificationSettings.soundType) {
             0 -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             1 -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             2 -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+            3 -> customSoundUri ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             else -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         }
 

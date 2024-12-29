@@ -76,13 +76,20 @@ class LockScreenService : Service() {
     inner class LockScreenReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                Intent.ACTION_SCREEN_OFF, Intent.ACTION_SCREEN_ON -> {
-                    val lockScreenIntent = Intent(context, LockScreenActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                Intent.ACTION_SCREEN_OFF -> {
+                    // 화면이 꺼질 때만 잠금화면을 표시하도록 수정
+                    val showLockScreen = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+                        .getBoolean("show_todo_list", false)
+
+                    if (showLockScreen) {
+                        val lockScreenIntent = Intent(context, LockScreenActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                                    Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        }
+                        context.startActivity(lockScreenIntent)
                     }
-                    context.startActivity(lockScreenIntent)
-                }
-            }
+            }}
         }
     }
 
