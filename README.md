@@ -24,9 +24,6 @@
 
 ---
 
-## 프로젝트 스크린샷
-<img src="![image](https://github.com/user-attachments/assets/6a702338-3fb5-453d-9d32-a0c67833fd0f)
-" alt="프로젝트 스크린샷 예시" width="600"/>
 
 ---
 
