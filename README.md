@@ -1,5 +1,5 @@
 ![image](https://github.com/user-attachments/assets/036818b8-b6bc-4f9a-b6ab-592733ea35fc)# 갤럭시 핸드폰 Todo 캘린더 프로젝트
-ㅁ
+
 ## 주요 설명
 - **Todo 캘린더**: 갤럭시 핸드폰의 캘린더 기능과 시계(Todo 리스트)를 결합한 어플리케이션
 - **수상 경력 및 설명**: 
